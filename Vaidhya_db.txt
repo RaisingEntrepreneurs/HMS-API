@@ -1,0 +1,10 @@
+{
+  
+    "user": "postgres",
+    "host": "localhost",
+    "database": "postgres",
+    "password": "sindhu",
+    "port": 5432,
+    "ssl": false
+    
+  }
