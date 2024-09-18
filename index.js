@@ -155,7 +155,31 @@ app.delete('/api/checkSession/:sessionID', async (req, res) => {
     res.status(500).json({ error: 'An error occurred while deleting session' });
   }
 });
+/////////////////////login user's////////////////////////////////////////////////////
+app.post('/api/vaidhyalogin', async (req, res) => {
+  const { username, password } = req.body;
 
+  try {
+    const result = await pool.query('SELECT * FROM "vaidhya_user" WHERE "usrnme" = $1', [username]);
+
+    if (result.rowCount === 1) {
+      const hashedPasswordFromDB = result.rows[0].pswd; // Get the hashed password from the database
+      const passwordMatch = await bcrypt.compare(password, hashedPasswordFromDB); // Compare hashed password from frontend with hashed password from database
+      if (passwordMatch) {
+        req.session.username = result.rows[0].usrnme;
+        logger.log( req.session)
+        res.json({ success: true, message: 'Login successful!',username:result.rows[0].usrnme ,result});
+      } else {
+        res.json({ success: false, message: 'Incorrect password' });
+      }
+    } else {
+      res.json({ success: false, message: 'Invalid username' });
+    }
+  } catch (error) {
+    logger.error('An error occurred:', error);
+    res.status(500).json({ success: false, message: 'An error occurred' });
+  }
+});
 
 // Endpoint to get a specific patient by ID
 app.post('/api/patients', async (req, res) => {
